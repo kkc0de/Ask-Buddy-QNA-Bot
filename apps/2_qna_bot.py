@@ -1,19 +1,23 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
-    temperature=0.3)
+# Initialize Gemini (stable)
+llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash",
+    temperature=0.3
+)
 
-st.title('🤖 Ask Buddy QNA Bot')
-st.markdown('My QNA Bot with LangChain and Google Gemini')
+st.title("🤖 Ask Buddy QNA Bot")
+st.markdown("My QNA Bot with LangChain and Google Gemini")
 
 # Initialize chat history
-if 'messages' not in st.session_state:
+if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Clear chat
 if st.button("🧹 Clear Chat"):
     st.session_state.messages = []
     st.rerun()
@@ -27,36 +31,33 @@ for message in st.session_state.messages:
 query = st.chat_input("Ask me anything ?")
 
 if query:
-    # Add user message to history
-    st.session_state.messages.append(
-        {"role": "user", "content": query}
-    )
-
+    # Show user message immediately
     with st.chat_message("user"):
         st.markdown(query)
 
-    conversation = (
-        "You are Ask Buddy, a helpful, concise AI assistant.\n\n"
-    )
+    # ---- BUILD GEMINI-SAFE PROMPT ----
+    conversation = "You are Ask Buddy, a helpful, concise AI assistant.\n\n"
 
-    # 🔥 SEND FULL HISTORY, NOT JUST QUERY
-    
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             conversation += f"User: {msg['content']}\n"
         elif msg["role"] == "ai":
             conversation += f"Assistant: {msg['content']}\n"
 
-    conversation += "Assistant:"
+    # Append current query ONLY ONCE
+    conversation += f"User: {query}\nAssistant:"
 
-    # Invoke Gemini with plain text (STABLE)
+    # Invoke Gemini with plain text (stable)
     response = llm.invoke(conversation)
 
-    #Show AI respose
+    # Show AI response
     with st.chat_message("ai"):
         st.markdown(response.content)
 
-    # Add AI response to history
+    # Save messages AFTER response
+    st.session_state.messages.append(
+        {"role": "user", "content": query}
+    )
     st.session_state.messages.append(
         {"role": "ai", "content": response.content}
     )
