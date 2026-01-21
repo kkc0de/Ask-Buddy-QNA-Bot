@@ -4,12 +4,15 @@ load_dotenv()
 import streamlit as st
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-st.title("Gemini Health Check")
+st.title("🧪 Gemini Health Check")
 
+# ✅ CORRECT LangChain-compatible model name
 llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",
+    model="models/gemini-pro",
     temperature=0
 )
+
+st.markdown("This checks whether Gemini is reachable from Streamlit Cloud.")
 
 if st.button("Test Gemini"):
     try:
