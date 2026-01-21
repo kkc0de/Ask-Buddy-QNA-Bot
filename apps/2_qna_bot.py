@@ -14,15 +14,10 @@ st.markdown('My QNA Bot with LangChain and Google Gemini')
 
 # Initialize chat history
 if 'messages' not in st.session_state:
-    st.session_state.messages = [
-        {
-            "role": "system",
-            "content": "You are Ask Buddy, a helpful, concise AI assistant."
-        }
-    ]
+    st.session_state.messages = []
 
 if st.button("🧹 Clear Chat"):
-    st.session_state.messages = st.session_state.messages[:1]
+    st.session_state.messages = []
     st.rerun()
 
 # Display chat history
@@ -44,7 +39,9 @@ if query:
         st.markdown(query)
 
     # 🔥 SEND FULL HISTORY, NOT JUST QUERY
-    lc_messages = []
+    lc_messages = [
+         HumanMessage(content="You are Ask Buddy, a helpful, concise AI assistant.")
+    ]
 
     for msg in st.session_state.messages:
         if msg["role"] == "user":
