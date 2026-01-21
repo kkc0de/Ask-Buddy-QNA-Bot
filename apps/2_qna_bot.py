@@ -4,7 +4,8 @@ load_dotenv()
 from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
 
-llm = ChatGoogleGenerativeAI(model='models/gemini-2.5-flash-lite')
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
+    temperature=0.3)
 
 st.title('🤖 Ask Buddy QNA Bot')
 st.markdown('My QNA Bot with LangChain and Google Gemini')
