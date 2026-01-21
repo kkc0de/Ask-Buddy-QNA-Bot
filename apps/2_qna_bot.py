@@ -4,60 +4,42 @@ load_dotenv()
 import streamlit as st
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# Initialize Gemini (stable)
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash",
     temperature=0.3
 )
 
 st.title("🤖 Ask Buddy QNA Bot")
-st.markdown("My QNA Bot with LangChain and Google Gemini")
+st.markdown("A conversational AI chatbot built with Google Gemini")
 
-# Initialize chat history
+# UI-only chat history (NOT sent to model)
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Clear chat
 if st.button("🧹 Clear Chat"):
     st.session_state.messages = []
     st.rerun()
 
-# Display chat history
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-# User input
-query = st.chat_input("Ask me anything ?")
+query = st.chat_input("Ask me anything")
 
 if query:
-    # Show user message immediately
+    # show user
+    st.session_state.messages.append({"role": "user", "content": query})
     with st.chat_message("user"):
         st.markdown(query)
 
-    # ---- BUILD GEMINI-SAFE PROMPT ----
-    conversation = "You are Ask Buddy, a helpful, concise AI assistant.\n\n"
+    # 🔒 SIMPLE, STABLE PROMPT (NO HISTORY)
+    prompt = f"You are a helpful AI assistant. Answer clearly.\n\nUser: {query}\nAssistant:"
 
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            conversation += f"User: {msg['content']}\n"
-        elif msg["role"] == "ai":
-            conversation += f"Assistant: {msg['content']}\n"
+    response = llm.invoke(prompt)
 
-    # Append current query ONLY ONCE
-    conversation += f"User: {query}\nAssistant:"
-
-    # Invoke Gemini with plain text (stable)
-    response = llm.invoke(conversation)
-
-    # Show AI response
-    with st.chat_message("ai"):
-        st.markdown(response.content)
-
-    # Save messages AFTER response
-    st.session_state.messages.append(
-        {"role": "user", "content": query}
-    )
     st.session_state.messages.append(
         {"role": "ai", "content": response.content}
     )
+
+    with st.chat_message("ai"):
+        st.markdown(response.content)
