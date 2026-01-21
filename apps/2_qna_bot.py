@@ -8,7 +8,7 @@ st.title("🧪 Gemini Health Check")
 
 # ✅ CORRECT LangChain-compatible model name
 llm = ChatGoogleGenerativeAI(
-    model="models/gemini-pro",
+    model="models/gemini-1.5-pro",
     temperature=0
 )
 
