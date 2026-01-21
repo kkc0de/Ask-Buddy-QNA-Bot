@@ -1,7 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-from langchain_core.messages import HumanMessage, AIMessage
-
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
@@ -22,9 +20,8 @@ if st.button("🧹 Clear Chat"):
 
 # Display chat history
 for message in st.session_state.messages:
-    if message["role"] != "system":
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 # User input
 query = st.chat_input("Ask me anything ?")
@@ -38,20 +35,24 @@ if query:
     with st.chat_message("user"):
         st.markdown(query)
 
-    # 🔥 SEND FULL HISTORY, NOT JUST QUERY
-    lc_messages = [
-         HumanMessage(content="You are Ask Buddy, a helpful, concise AI assistant.")
-    ]
+    conversation = (
+        "You are Ask Buddy, a helpful, concise AI assistant.\n\n"
+    )
 
+    # 🔥 SEND FULL HISTORY, NOT JUST QUERY
+    
     for msg in st.session_state.messages:
         if msg["role"] == "user":
-            lc_messages.append(HumanMessage(content=msg["content"]))
+            conversation += f"User: {msg['content']}\n"
         elif msg["role"] == "ai":
-            lc_messages.append(AIMessage(content=msg["content"]))
+            conversation += f"Assistant: {msg['content']}\n"
 
-    response = llm.invoke(lc_messages)
+    conversation += "Assistant:"
 
+    # Invoke Gemini with plain text (STABLE)
+    response = llm.invoke(conversation)
 
+    #Show AI respose
     with st.chat_message("ai"):
         st.markdown(response.content)
 
