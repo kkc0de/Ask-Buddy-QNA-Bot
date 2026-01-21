@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
+from langchain_core.messages import HumanMessage, AIMessage
+
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
@@ -42,7 +44,16 @@ if query:
         st.markdown(query)
 
     # 🔥 SEND FULL HISTORY, NOT JUST QUERY
-    response = llm.invoke(st.session_state.messages)
+    lc_messages = []
+
+    for msg in st.session_state.messages:
+        if msg["role"] == "user":
+            lc_messages.append(HumanMessage(content=msg["content"]))
+        elif msg["role"] == "ai":
+            lc_messages.append(AIMessage(content=msg["content"]))
+
+    response = llm.invoke(lc_messages)
+
 
     with st.chat_message("ai"):
         st.markdown(response.content)
