@@ -1,6 +1,6 @@
 # 🤖 Ask Buddy – QNA Bot
 
-Ask Buddy is a conversational AI chatbot built using **LangChain**, **Groq**, and **Streamlit**.  
+Ask Buddy is a conversational AI chatbot built using **LangChain**, **Groq(LLaMA 3.1)**, and **Streamlit**.  
 It supports **multi-turn conversational memory**, allowing users to ask follow-up questions with proper context.
 
 ---
